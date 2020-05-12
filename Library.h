@@ -3,12 +3,12 @@
 #include "Functions.h"
 
 
-//ここから図書館
-//リズムゲーム用関数
+//Library from here
+//Functions for rhythm games
 static int rithm_lib(int music, double BPM) {
 	int beat;
 
-	//音楽が止まっていたら音楽再生。とりあえずの形式なので後で音楽の再生方法は変えます
+	//Play music if music is stopped. It's just a format, so I'll change the way I play music later
 	if (CheckSoundMem(music)) {
 
 	}
@@ -17,12 +17,12 @@ static int rithm_lib(int music, double BPM) {
 		PlaySoundMem(music, DX_PLAYTYPE_BACK);
 	}
 
-	//そのまま音楽の再生時間を出力すると大きすぎるので多少小さくするため部分です
+	//Outputting the music playback time as it is is too large, so it is a part to reduce it a little
 	beat = (int)(GetSoundCurrentTime(music) * BPM * 64 / 60000);
 	return beat;
 }
 
-//下の関数の実際に音楽を停止させたり再生したりする部分
+//The part of the function below that actually stops and plays the music
 static void music_onoff_lib(int music, int beat, int stop_now, double BPM) {
 	int elapsed_time = (int)(beat / BPM / 64 * 60000);
 	if (stop_now == 1) {
@@ -34,7 +34,7 @@ static void music_onoff_lib(int music, int beat, int stop_now, double BPM) {
 	}
 }
 
-//音楽の停止と再生の切り替えのための関数です
+//Function for switching between stopping and playing music
 static bool stop_lib(int music, int beat, double BPM) {
 	static bool stop_now = 0;
 	static bool ttt = 1;
@@ -52,7 +52,7 @@ static bool stop_lib(int music, int beat, double BPM) {
 	return stop_now;
 }
 
-//音楽停止中に音楽の経過時間を操作するための関数
+//Functions for manipulating the elapsed time of music while music is stopped
 static int movetime_lib() {
 	int x = 0;
 	if (CheckHitKey(KEY_INPUT_UP)) {
@@ -67,7 +67,7 @@ static int movetime_lib() {
 	return x;
 }
 
-//単調だったり動かない物体や背景の描画を管理する関数
+//Functions to manage the drawing of monotonous or immobile objects and backgrounds
 static void image_back_ground_lib(bool stop_now, int beat) {
 	int i, j;
 	static int hondana = LoadGraph("img/hondana.jpg");
@@ -89,7 +89,7 @@ static void image_back_ground_lib(bool stop_now, int beat) {
 	};
 
 
-	//これは一定時間経過した後に延々と四角を左に流し続けるもの。この部分を本棚とする
+	//This is a square that keeps flowing to the left after a certain period of time. This part is the bookshelf
 	DrawGraph(hondanaposi.x, hondanaposi.y, hondana, TRUE);
 	DrawGraph(hondanaposi2.x, hondanaposi2.y, hondana, TRUE);
 	DrawGraph(hondanaposi3.x, hondanaposi3.y, hondana, TRUE);
@@ -120,7 +120,7 @@ static void image_back_ground_lib(bool stop_now, int beat) {
 	}
 }
 
-//プレイヤーが操作するキャラクターの描画管理する関数
+//A function to manage the drawing of the character operated by the player
 static void image_hero_lib(bool stop_now, int beat, bool hantei) {
 	static int player1 = LoadGraph("img/zikuride1.png");
 	static int player2 = LoadGraph("img/zikuride2.png");
@@ -135,7 +135,7 @@ static void image_hero_lib(bool stop_now, int beat, bool hantei) {
 	};
 
 	if (hantei) {
-		//もし本の山や魔法弾を斬るのに失敗したら点滅する
+		//Blinks if you fail to kill a pile of books or magic bullets
 		static bool n = 0;
 		if (n == 0) {
 			DrawGraph(hero.x, hero.y, player1, TRUE);
@@ -143,9 +143,9 @@ static void image_hero_lib(bool stop_now, int beat, bool hantei) {
 		onoff(&n);
 	}
 	else {
-		//青くて四角い箱(勇者)を描画
+		//Draw a blue square box (Brave)
 	}
-	//方向キーが入力された方向へ青くて四角い箱(剣)を出す
+	//Put out a blue square box (sword) in the direction in which the direction key was entered
 	if (CheckHitKey(KEY_INPUT_RIGHT)) {
 		DrawGraph(hero.x, hero.y, player2, TRUE);
 	}
@@ -157,7 +157,7 @@ static void image_hero_lib(bool stop_now, int beat, bool hantei) {
 	}
 
 }
-//動く物体の描画管理する関数
+//Functions for managing drawing of moving objects
 static void gimmick_image_lib(bool stop_now, int beat, bool hantei, bool book_kill, bool magic_kill, bool hentai) {
 	int i, j;
 	static bool start = 1;
@@ -168,7 +168,7 @@ static void gimmick_image_lib(bool stop_now, int beat, bool hantei, bool book_ki
 		int x;
 		int y;
 	};
-	//緑の四角(ウーラ)と赤い丸(魔弾)
+	//Green square (oura) and red circle (magic bullet)
 	{
 		static int magic_beat = beat;
 		static position ura = {
@@ -210,7 +210,7 @@ static void gimmick_image_lib(bool stop_now, int beat, bool hantei, bool book_ki
 			magic.y = 1000;
 		}
 	}
-	//茶色い四角(本の山)
+	//Brown square (a pile of books)
 	{
 		static position books[256];
 		static int num = 0;
@@ -248,7 +248,7 @@ static void gimmick_image_lib(bool stop_now, int beat, bool hantei, bool book_ki
 	}
 }
 
-//譜面管理
+//Music score management
 static int humen_lib(char name[], int beat, bool stop_now) {
 	static bool hantei[6][4096][2];
 	static bool start = 1;
@@ -265,7 +265,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 
 
 	int i, j;
-	//譜面データのロード
+	//Loading score data
 	if (start) {
 
 		FILE* fo;
@@ -293,7 +293,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 		start = 0;
 	}
 
-	//譜面の保存
+	//Save score
 	if (CheckHitKey(KEY_INPUT_S)) {
 		FILE* fs;
 		fopen_s(&fs, name, "wb");
@@ -305,7 +305,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 		fclose(fs);
 	}
 
-	//譜面をセーブしたものまで戻す
+	//Return the score to the saved one
 	if (CheckHitKey(KEY_INPUT_R)) {
 		for (i = 0; i < 6; ++i) {
 			for (j = 0; j < 4096; ++j) {
@@ -313,14 +313,14 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 			}
 		}
 	}
-	//判定
+	//Judgment
 	if (CheckHitKey(KEY_INPUT_RIGHT)) {
 		DrawBox(235, 160, 255, 180, GREEN, 1);
 
 		if (rensya_right) {
 			for (i = -2; i <= 2; ++i) {
 				if (hantei[2][beat + 16 + i][0]) {
-					tokuten = 100 - 10 * abs(i);				//スコア加算(ジャストからのズレ*10マイナスされる)
+					tokuten = 100 - 10 * abs(i);				//Score addition (deviation from just * 10 minus)
 					hantei[2][beat + 16 + i][0] = 0;
 					book_kill = 1;
 					//ChangeVolumeSoundMem(255 * VOL / 100, killsound);
@@ -345,7 +345,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 		if (rensya_left) {
 			for (i = -2; i <= 2; ++i) {
 				if (hantei[3][beat + 16 + i][0]) {
-					tokuten = 100 - 10 * abs(i);				//スコア加算(ジャストからのズレ*10マイナスされる)
+					tokuten = 100 - 10 * abs(i);				//Score addition (deviation from just * 10 minus)
 					hantei[3][beat + 16 + i][0] = 0;
 					magic_kill = 1;
 					PlaySoundMem(killsound, DX_PLAYTYPE_BACK, TRUE);
@@ -363,7 +363,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 		rensya_left = 1;
 	}
 
-	//判定作成
+	//Judgment creation
 	{
 		if (CheckHitKey(KEY_INPUT_3)) {
 			if (rensya[2]) {
@@ -389,7 +389,7 @@ static int humen_lib(char name[], int beat, bool stop_now) {
 
 	}
 
-	//描画
+	//drawing
 	image_back_ground_lib(stop_now, beat / 16);
 	gimmick_image_lib(stop_now, beat / 16, hantei[2][beat + 40][0], book_kill, magic_kill, hantei[3][beat + 40][0]);
 	j = 0;
@@ -420,11 +420,11 @@ void lib_execute() {
 	bool stop_lib(int music, int elapsed_time, double BPM);
 	int movetime_lib();
 
-	//BGMのデータ
+	//BGM data
 	struct BGM {
-		char dat[64];//譜面データの保存先です。すぐ下の"test"の例のように文字列の最後に拡張子として.datを入力してください
-		int music;   //BGMのファイル
-		double BPM;  //BGMのBPM
+		char dat[64];//The storage location of musical score data. Enter .dat as the extension at the end of the string as in the "test" example just below
+		int music;   //BGM file
+		double BPM;  //BGM BPM
 	};
 	BGM test = {
 		"hu/library.dat",
@@ -432,9 +432,9 @@ void lib_execute() {
 		128.0
 	};
 	int score = 0;
-	int elapsed_time = 0; //経過時間
-	int beat = 0;         //拍数
-	bool stop_now = 0;    //リズムゲームを停止しているかどうか
+	int elapsed_time = 0; //elapsed time
+	int beat = 0;         //Number of beats
+	bool stop_now = 0;    //Whether the rhythm game is stopped
 
 	PlaySoundMem(test.music, DX_PLAYTYPE_BACK);
 
@@ -442,12 +442,12 @@ void lib_execute() {
 	{
 
 		if (stop_lib(test.music, elapsed_time, test.BPM) == 0) {
-			//もしリズムゲームを停止していないならばelapsed_timeにBGMの経過時間を代入する。
+			//If the rhythm game is not stopped, substitute the elapsed time of BGM for elapsed_time.
 			elapsed_time = rithm_lib(test.music, test.BPM);
 			stop_now = 0;
 		}
 		else {
-			//elapsed_timeを手動入力された分ずらす
+			//Shift elapsed_time by the manually entered amount
 			elapsed_time += movetime_lib();
 			stop_now = 1;
 		}
@@ -503,6 +503,6 @@ void lib_execute() {
 
 }
 
-//ここまで図書館
+//Up to here library
 
 
